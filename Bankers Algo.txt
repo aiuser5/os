@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+void calculateNeedMatrix(int max[10][10], int alloc[10][10], int need[10][10], int n, int m)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            need[i][j] = max[i][j] - alloc[i][j];
+        }
+    }
+}
+
+bool isSafe(int processes[10], int avail[10], int max[10][10], int alloc[10][10], int n, int m)
+{
+    int need[10][10];
+    calculateNeedMatrix(max, alloc, need, n, m);
+
+    bool flag[10] = {false};
+    int safeSeq[10];
+    int avail_new[10];
+    for (int i = 0; i < m; i++)
+    {
+        avail_new[i] = avail[i];
+    }
+
+    int count = 0;
+    while (count < n)
+    {
+        bool found = false;
+        for (int i = 0; i < n; i++)
+        {
+            if (flag[i] == false)
+            {
+                bool canAllocate = true;
+                for (int j = 0; j < m; j++)
+                {
+                    if (need[i][j] > avail_new[j])
+                    {
+                        canAllocate = false;
+                        break;
+                    }
+                }
+                if (canAllocate)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        avail_new[j] += alloc[i][j];
+                    }
+                    safeSeq[count++] = i;
+                    flag[i] = true;
+                    found = true;
+                }
+            }
+        }
+        if (!found)
+        {
+            printf("No safe sequence exists.\n");
+            return false;
+        }
+    }
+
+    printf("PID | Allocation | Max      | Need\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%2d  |", processes[i]);
+        for (int j = 0; j < m; j++)
+        {
+            printf(" %d", alloc[i][j]);
+        }
+        printf("    |");
+        for (int j = 0; j < m; j++)
+        {
+            printf(" %d", max[i][j]);
+        }
+        printf("  |");
+        for (int j = 0; j < m; j++)
+        {
+            printf(" %d", need[i][j]);
+        }
+        printf("\n");
+    }
+    printf("************************************");
+    printf("\n");
+    printf("* Safe Sequence: ");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d", processes[safeSeq[i]]);
+        if (i < n - 1)
+        {
+            printf("-> ");
+        }
+    }
+    printf(" *");
+    printf("\n");
+    printf("************************************");
+    printf("\n");
+
+    printf("Available Vector after Safe Sequence: ");
+    for (int i = 0; i < m; i++)
+    {
+        printf("%d ", avail_new[i]);
+    }
+    printf("\n");
+
+    return true;
+}
+
+int main()
+{
+    int n, m;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    printf("Enter the number of resources: ");
+    scanf("%d", &m);
+
+    int processes[10];
+    int max[10][10];
+    int alloc[10][10];
+    int avail[10];
+
+    printf("Enter the processes: ");
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &processes[i]);
+    }
+
+    printf("Enter the Allocation Matrix:\n");
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            scanf("%d", &alloc[i][j]);
+        }
+    }
+
+    printf("Enter the Max Matrix:\n");
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            scanf("%d", &max[i][j]);
+        }
+    }
+
+    printf("Enter the Available Vector:\n");
+    for (int i = 0; i < m; i++)
+    {
+        scanf("%d", &avail[i]);
+    }
+    printf("**************************************");
+    printf("\n");
+    isSafe(processes, avail, max, alloc, n, m);
+
+    return 0;
+}
