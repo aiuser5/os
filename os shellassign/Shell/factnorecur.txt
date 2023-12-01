@@ -1,0 +1,12 @@
+#!/bin/bash
+factorial() {
+local number=$1
+local factorial=1
+for ((i=1; i<=number; i++)); do
+factorial=$((factorial * i))
+done
+echo "$factorial"
+}
+input_number=$1
+factorial=$(factoria $input_number)
+echo "Factorial of $input_number is: $factorial"
